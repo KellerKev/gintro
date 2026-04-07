@@ -116,11 +116,11 @@ proc prep =
 
   exec("nim c gen.nim")
   mkDir("nim_gi")
-  # GDK_BACKEND=offscreen avoids "cannot open display" in headless CI environments.
+  # In CI, xvfb-run provides a virtual X display (DISPLAY=:99) before nimble runs.
   # GObject-Introspection loads GTK typelibs which may trigger GDK initialization;
-  # the offscreen backend satisfies this without needing an X11/Wayland display.
-  exec("GDK_BACKEND=offscreen " & td / wd / "gen")   # generate GTK3 bindings
-  exec("GDK_BACKEND=offscreen " & td / wd / "gen 1") # generate GTK4 + libsoup3 bindings
+  # the inherited DISPLAY env var satisfies this without needing a real display.
+  exec(td / wd / "gen")   # generate GTK3 bindings
+  exec(td / wd / "gen 1") # generate GTK4 + libsoup3 bindings
 
   # Copy helper modules (not generated, sourced from repo)
   cpFile(this / "gintro" / "gimplglib.nim", td / wd / "nim_gi" / "gimplglib.nim")
