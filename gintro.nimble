@@ -58,7 +58,10 @@ proc patchGeneratedBindings(gintroDir: string) =
      "    caps = nil\n" &
      "  if result != nil and result.impl == nil:",
      "  result.impl = cast[ptr Caps00](g_boxed_copy(gst_caps_get_type(), result.impl))\n" &
-     "  if result != nil and result.impl == nil:")
+     "  if result != nil and result.impl == nil:"),
+    # acquireBuffer: gen.nim omits 'result =' for the C call (triggered by certain GStreamer typelib versions)
+    ("\n  gst_buffer_pool_acquire_buffer(cast[ptr BufferPool00](self.impl)",
+     "\n  result = gst_buffer_pool_acquire_buffer(cast[ptr BufferPool00](self.impl)")
   ])
 
   # Fix glib.nim: relax early forward-decl return types (ptr glib.List not yet defined).

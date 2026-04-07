@@ -7277,7 +7277,7 @@ proc gst_buffer_pool_acquire_buffer(self: ptr BufferPool00; buffer: var ptr Buff
 proc acquireBuffer*(self: BufferPool; buffer: var Buffer;
     params: BufferPoolAcquireParams = nil): FlowReturn =
   fnew(buffer, gBoxedFreeGstBuffer)
-  gst_buffer_pool_acquire_buffer(cast[ptr BufferPool00](self.impl), cast[var ptr Buffer00](addr buffer.impl), if params.isNil: nil else: cast[ptr BufferPoolAcquireParams00](params.impl))
+  result = gst_buffer_pool_acquire_buffer(cast[ptr BufferPool00](self.impl), cast[var ptr Buffer00](addr buffer.impl), if params.isNil: nil else: cast[ptr BufferPoolAcquireParams00](params.impl))
   if buffer != nil and buffer.impl == nil:
     buffer.ignoreFinalizer = true
     buffer = nil
