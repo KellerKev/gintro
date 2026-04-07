@@ -227,9 +227,12 @@ proc $1$2 {.cdecl.} =
 
     elif resl == "int32":
       resu.add(".int32")
-      
+
     elif resl == "cstring":
       resu.add(".g_strdup")
+
+    elif resl.endsWith("Return") or resl.endsWith("Result") or resl.endsWith("Answer"):
+      discard # enum return type (e.g. gst.FlowReturn): return value directly, no proxy needed
 
     elif resl.len != 0: # result is heavy proxy object. Actually this is an ugly guess currently.
       r1s.add("  let tmp = " & resu[2 .. ^1] & "\n")

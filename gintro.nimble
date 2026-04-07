@@ -39,9 +39,26 @@ proc patchGeneratedBindings(gintroDir: string) =
     ("new(x, finalizerfree)", "new(x)")
   ])
 
-  # Fix cairo.nim: comment out cairoimpl include to avoid duplicate types
-  patchFile(gintroDir / "cairo.nim", [
-    ("include cairoimpl", "# include cairoimpl  # disabled: types already defined in generated cairo.nim")
+  # cairo.nim: cairoimpl include is needed (provides lineTo, moveTo, save, etc.)
+  # On macOS it was disabled due to type duplication, but gen.nim now generates
+  # correct set[] types so cairoimpl includes cleanly on both platforms.
+
+  # Fix gst.nim: gen.nim doubles the default value for certain var-typed out
+  # parameters, producing malformed code like:
+  #   cast[var T](nil) = cast[var T = cast[var T](nil)](nil)
+  # Strip the spurious second assignment.
+  patchFile(gintroDir / "gst.nim", [
+    # gen.nim doubles the default value for certain var-typed out parameters
+    ("cast[var gobject.Value](nil) = cast[var gobject.Value = cast[var gobject.Value](nil)](nil)",
+     "cast[var gobject.Value](nil)"),
+    # parseCapsResult result-overload has orphaned `caps` refs from the var-overload
+    ("  result.impl = cast[ptr Caps00](g_boxed_copy(gst_caps_get_type(), result.impl))\n" &
+     "  if caps != nil and caps.impl == nil:\n" &
+     "    caps.ignoreFinalizer = true\n" &
+     "    caps = nil\n" &
+     "  if result != nil and result.impl == nil:",
+     "  result.impl = cast[ptr Caps00](g_boxed_copy(gst_caps_get_type(), result.impl))\n" &
+     "  if result != nil and result.impl == nil:")
   ])
 
   # Fix glib.nim: relax early forward-decl return types (ptr glib.List not yet defined).

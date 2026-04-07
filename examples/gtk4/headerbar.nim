@@ -106,7 +106,7 @@ proc main =
   let window = newWindow(MyWindow)
   addCssClass(window, "main") # gtk_widget_add_css_class (window, "main");
   let provider = newCssProvider()
-  provider.loadFromData(Css)
+  provider.loadFromString(Css) # loadFromData removed in GTK4; use loadFromString
   addProviderForDisplay(getDisplay(window), provider, STYLE_PROVIDER_PRIORITY_USER)
   changeHeader(nil, window)
   let box = newBox(Orientation.vertical, 0)

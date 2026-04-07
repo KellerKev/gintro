@@ -100,7 +100,7 @@ proc main =
     filename = argv[1]
   else:
     filename = "/usr/share/sounds/ekiga/ring.wav"
-  if not fileTest(filename, FileTest.exists):
+  if not fileTest(filename, {FileTestFlag.exists}):
     echo("File $1 does not exist" % [filename])
     # g_free(filename)
     quit(QuitFailure)
