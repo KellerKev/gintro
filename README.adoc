@@ -42,6 +42,16 @@ import gintro/[gtk4, webkit25]
 # New:
 import gintro/[gtk4, webkit6]
 ----
+
+*Known untested example — `examples/gtk3/fullgstcompiletest.nim`:*
+
+This example imports every GStreamer binding module including `gstinsertbin`, `gstmpegts`,
+`gstplayer`, and `gstwebrtc`. These modules require typelibs that are *not available* in the
+standard `gir1.2-gst-plugins-bad-1.0` package on Ubuntu 22.04/24.04 and Debian-based distros.
+The example is provided for reference only and is excluded from CI. If you need those modules,
+you will need to build GStreamer bad plugins from source and ensure the corresponding `.typelib`
+files are present in your `GI_TYPELIB_PATH`.
+
 :experimental:
 :imagesdir: http://ssalewski.de/tmp
 //:source-highlighter: pygments

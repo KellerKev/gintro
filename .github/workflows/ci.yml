@@ -13,16 +13,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install GTK4 and GObject-Introspection dependencies
+      - name: Install GTK4/GTK3 and GObject-Introspection dependencies
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y \
             libgtk-4-dev \
+            libgtk-3-dev \
             gobject-introspection \
             libgirepository1.0-dev \
             libcairo2-dev \
             libpango1.0-dev \
             libgdk-pixbuf-2.0-dev \
+            libgstreamer1.0-dev \
+            libgstreamer-plugins-base1.0-dev \
+            gir1.2-gstreamer-1.0 \
+            gir1.2-gst-plugins-base-1.0 \
+            libsoup-3.0-dev \
+            gir1.2-soup-3.0 \
             pkg-config \
             wget \
             curl
@@ -35,9 +42,21 @@ jobs:
       - name: Generate and install gintro bindings
         run: |
           export GI_TYPELIB_PATH="/usr/lib/x86_64-linux-gnu/girepository-1.0:/usr/lib/girepository-1.0"
+          export GDK_BACKEND=offscreen
           nimble install -y
 
-      - name: Compile GTK4 example
+      - name: Compile GTK4 examples
         run: |
           export GI_TYPELIB_PATH="/usr/lib/x86_64-linux-gnu/girepository-1.0:/usr/lib/girepository-1.0"
           nim c --hints:off examples/gtk4/app0.nim
+          nim c --hints:off examples/gtk4/headerbar.nim
+          nim c --hints:off examples/gtk4/textview.nim
+          nim c --hints:off examples/gtk4/treelist.nim
+
+      - name: Compile GTK3 examples
+        run: |
+          export GI_TYPELIB_PATH="/usr/lib/x86_64-linux-gnu/girepository-1.0:/usr/lib/girepository-1.0"
+          nim c --hints:off examples/gtk3/app0.nim
+          nim c --hints:off examples/gtk3/button.nim
+          nim c --hints:off examples/gtk3/gstBasicTutorial1.nim
+          nim c --hints:off examples/gtk3/appsink_src.nim

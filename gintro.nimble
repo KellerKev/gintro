@@ -116,6 +116,10 @@ proc prep =
 
   exec("nim c gen.nim")
   mkDir("nim_gi")
+  # GDK_BACKEND=offscreen avoids "cannot open display" in headless CI environments.
+  # GObject-Introspection loads GTK typelibs which may trigger GDK initialization;
+  # the offscreen backend satisfies this without needing an X11/Wayland display.
+  putEnv("GDK_BACKEND", "offscreen")
   exec(td / wd / "gen")   # generate GTK3 bindings
   exec(td / wd / "gen 1") # generate GTK4 + libsoup3 bindings
 
