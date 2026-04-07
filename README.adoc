@@ -1,6 +1,27 @@
 = High level GTK4 and GTK3 bindings for the Nim programming language
-//(c) Stefan Salewski                                     
-//Version 0.9.9
+// Original author: Stefan Salewski
+// Revived and maintained by: Kevin Keller (KellerKev)
+//Version 1.0.0
+
+image:https://github.com/KellerKev/gintro/actions/workflows/ci.yml/badge.svg[CI,link=https://github.com/KellerKev/gintro/actions/workflows/ci.yml]
+
+NOTE: *This is a revived fork of the original https://github.com/StefanSalewski/gintro[gintro] by Stefan Salewski,
+which has been unmaintained since 2023.* This fork restores full compatibility with *Nim 2.x* (2.0+) on both
+Linux and macOS, and is the recommended way to use GTK4/GTK3 bindings with modern Nim.
+
+*Install:*
+[source,bash]
+----
+nimble install "https://github.com/KellerKev/gintro"
+----
+
+*What was fixed for Nim 2.x:*
+
+* `tests/gen.nim` — tuple-unpacking from `seq[string]` (no longer valid in Nim 2.x)
+* `tests/gen.nim` — generated `set[]` type aliases no longer carry `{.size: sizeof(cint).}` pragma
+* `tests/maxby.nim` — `func` changed to `proc` for closure-parameter functions
+* `gintro/gimplgobj.nim` — all tuple-unpacking from `split()` calls replaced with indexed access
+* `gintro.nimble` — post-generation patches for `gtk4.nim`, `gobject.nim`, `cairo.nim`, `glib.nim`
 :experimental:
 :imagesdir: http://ssalewski.de/tmp
 //:source-highlighter: pygments

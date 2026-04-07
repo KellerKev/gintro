@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install GTK4 and GObject-Introspection dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            libgtk-4-dev \
+            gobject-introspection \
+            libgirepository1.0-dev \
+            libcairo2-dev \
+            libpango1.0-dev \
+            libgdk-pixbuf-2.0-dev \
+            pkg-config \
+            wget \
+            curl
+
+      - name: Install Nim
+        uses: iffy/install-nim@v5
+        with:
+          version: "2.2.4"
+
+      - name: Generate and install gintro bindings
+        run: |
+          export GI_TYPELIB_PATH="/usr/lib/x86_64-linux-gnu/girepository-1.0:/usr/lib/girepository-1.0"
+          nimble install -y
+
+      - name: Compile GTK4 example
+        run: |
+          export GI_TYPELIB_PATH="/usr/lib/x86_64-linux-gnu/girepository-1.0:/usr/lib/girepository-1.0"
+          nim c --hints:off examples/gtk4/app0.nim
