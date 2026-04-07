@@ -398,15 +398,19 @@ const someEvent: HashSet[string] = """"
   EventOwnerChange EventGrabBroken EventTouchpadSwipe EventTouchpadPinch EventPadButton EventPadAxis EventPadGroupMode
   """.split.toHashSet
 
+var usingSoup3 {.global.}: bool # set true when Soup-3.0 is generated (GTK3 with libsoup3)
+
 proc fixedModName(s: string): string =
   result = s
   if not ISGTK3 and (s == "gdk" or s == "gtk" or s == "gdkx11"):
     result &= "4"
-  if not ISGTK3 and (s == "javascriptcore" or s == "webkit2" or s == "webkit2webextension"):
+  if not ISGTK3 and (s == "webkit2" or s == "webkit2webextension"):
     result &= "5"
+  if not ISGTK3 and (s == "javascriptcore" or s == "webkit" or s == "webkitwebprocessextension"):
+    result &= "6"
   if not ISGTK3 and (s == "gtksource"):
     result &= "5"
-  if not ISGTK3 and (s == "soup"):
+  if s == "soup" and (not ISGTK3 or usingSoup3):
     result &= "3"
   if not ISGTK3 and (s == "vte"):
     result &= "_gtk4"
@@ -3886,7 +3890,13 @@ proc main(namespace: string; version: cstring = nil) =
     if j == 0:
       importedModules = "import "
     output.writeLine("# ", dep[j])
-    let h = fixedModName(($dep[j]).split('-', 2)[0].toLowerAscii) & ", "
+    let depParts = ($dep[j]).split('-', 2)
+    let depBase = depParts[0].toLowerAscii
+    let depVer = if depParts.len > 1: depParts[1] else: ""
+    # Soup-3.0 always generates soup3.nim regardless of GTK version
+    let depMod = if depBase == "soup" and depVer.startsWith("3"): "soup3"
+                 else: fixedModName(depBase)
+    let h = depMod & ", "
     importedModules.add(h)
     if h == "gobject, ":
       weImportGObject = true
@@ -4503,11 +4513,18 @@ proc cairo_gobject_rectangle_get_type*(): GType {.importc, libprag.}
     if version == "5.0":
       suff = "5"
 
+  if namespace in ["WebKit", "WebKitWebProcessExtension"]:
+    suff = "6"
+
+  if namespace == "JavaScriptCore" and version == "6.0":
+    suff = "6"
+
   if namespace == "Soup":
     if version == "2.4":
       suff = ""
     if version == "3.0":
       suff = "3"
+      usingSoup3 = true
 
   if namespace == "Vte":
     if version == "2.91":
@@ -4654,9 +4671,9 @@ proc launch() =
 
     main("Soup", "3.0")
     main("cairo")
-    main("WebKit2", "5.0")
-    main("JavaScriptCore", "5.0")
-    main("WebKit2WebExtension", "5.0")
+    main("WebKit", "6.0")
+    main("JavaScriptCore", "6.0")
+    main("WebKitWebProcessExtension", "6.0")
     main("Gst")
     main("GstBase")
     main("GstAllocators")

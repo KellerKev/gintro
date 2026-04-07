@@ -11,12 +11,15 @@ macro mAddWatch(ch: IOChannel; pri: cint; cond: IOCondition; p: untyped; arg: ty
   var fixedCond = $(cond.toStrLit)
   #echo getTypeInst(cond)[0].toStrLit
   #echo getTypeInst(cond)[1].toStrLit
-  fixedCond.insert($(getTypeInst(cond)[1].toStrLit) & ".", 1)
+  # Nim 2.x: pure enum set literals already carry the type prefix, so no insert needed.
+  # Only insert if the literal doesn't already contain a '.':
+  when (NimMajor, NimMinor) < (2, 0):
+    fixedCond.insert($(getTypeInst(cond)[1].toStrLit) & ".", 1)
 
   var r1s = """
 
 proc $1(self: ptr IOChannel00; cond: IOCondition; userData: pointer): gboolean {.cdecl.} =
-  var ch1 {.global.}: glib.IOChannel
+  var ch1 {.global.}: IOChannel
   if ch1.isNil:
     new ch1
     GC_ref(ch1) # never call destroy/finalizer on this global variable

@@ -197,7 +197,8 @@ proc cbCandidateGatheringDone(agent: nice.Agent; streamId: int) =
   echo("")
   ##  Listen on stdin for the remote candidate list
   echo("Enter remote data (single line, no wrapping):")
-  discard addWatch(ioStdin, glib.PRIORITY_DEFAULT, {IOCFlag.`in`}, stdinRemoteInfoCb, agent)
+  let ioIn: IOCondition = {IOCFlag(0)} # IOCFlag.`in` = 0; backtick form breaks macro serialization
+  discard addWatch(ioStdin, glib.PRIORITY_DEFAULT, ioIn, stdinRemoteInfoCb, agent)
   stdout.write("> ")
   flushFile(stdout)
 
@@ -230,7 +231,8 @@ proc cbComponentStateChanged(agent: nice.Agent; streamId: int; componentId: int;
       echo(" [$1]:$2)" % [$ipaddr, $getPort(remote.impl.`addr`)])
     ## Listen to stdin and send data written to it
     echo("\nSend lines to remote (Ctrl-D to quit):")
-    discard addWatch(ioStdin, glib.PRIORITY_DEFAULT, {IOCFlag.`in`}, stdinSendDataCb, agent)
+    let ioIn2: IOCondition = {IOCFlag(0)} # IOCFlag.`in` = 0
+    discard addWatch(ioStdin, glib.PRIORITY_DEFAULT, ioIn2, stdinSendDataCb, agent)
     stdout.write("> ")
     flushFile(stdout)
   elif state == ComponentState.failed.ord:

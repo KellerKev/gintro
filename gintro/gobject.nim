@@ -965,16 +965,16 @@ type
 
 
 
-type
-  IOCFlag* {.size: sizeof(cint), pure.} = enum
-    `in` = 0
-    pri = 1
-    `out` = 2
-    err = 3
-    hup = 4
-    nval = 5
-
-  IOCondition* = set[IOCFlag]
+when not declared(IOCFlag):
+  type
+    IOCFlag* {.size: sizeof(cint), pure.} = enum
+      `in` = 0
+      pri = 1
+      `out` = 2
+      err = 3
+      hup = 4
+      nval = 5
+    IOCondition* = set[IOCFlag]
 
 type
   InitiallyUnowned* = ref object of Object
@@ -1420,7 +1420,7 @@ when defined(gcDestructors):
     when defined(gintroDebug):
       echo "destroy ", $typeof(self), ' ', cast[int](unsafeaddr self)
     if not self.ignoreFinalizer and self.impl != nil:
-      g_param_spec_pool_free(self.impl)
+      discard # g_param_spec_pool_free unavailable
       self.impl = nil
 
 proc newWithFinalizer*(x: var ParamSpecPool) =

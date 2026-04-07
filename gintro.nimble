@@ -36,7 +36,11 @@ proc patchGeneratedBindings(gintroDir: string) =
   # remove the call and leave self.impl = nil intact.
   patchFile(gintroDir / "gobject.nim", [
     ("g_param_spec_pool_free(self.impl)", "discard # g_param_spec_pool_free unavailable"),
-    ("new(x, finalizerfree)", "new(x)")
+    ("new(x, finalizerfree)", "new(x)"),
+    # IOCFlag/IOCondition are also in glib.nim; wrap in when-not-declared to avoid ambiguity
+    # when both glib and gobject are imported in the same module.
+    ("  IOCFlag* {.size: sizeof(cint), pure.} = enum\n    `in` = 0\n    pri = 1\n    `out` = 2\n    err = 3\n    hup = 4\n    nval = 5\n\n  IOCondition* = set[IOCFlag]",
+     "when not declared(IOCFlag):\n  type\n    IOCFlag* {.size: sizeof(cint), pure.} = enum\n      `in` = 0\n      pri = 1\n      `out` = 2\n      err = 3\n      hup = 4\n      nval = 5\n    IOCondition* = set[IOCFlag]")
   ])
 
   # cairo.nim: cairoimpl include is needed (provides lineTo, moveTo, save, etc.)
