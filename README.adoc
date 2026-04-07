@@ -9,6 +9,9 @@ NOTE: *This is a revived fork of the original https://github.com/StefanSalewski/
 which has been unmaintained since 2023.* This fork restores full compatibility with *Nim 2.x* (2.0+) on both
 Linux and macOS, and is the recommended way to use GTK4/GTK3 bindings with modern Nim.
 
+WARNING: *Nim 2.0 or later is required.* Support for Nim 1.x has been dropped as part of this revival.
+If you need Nim 1.x support, use the original https://github.com/StefanSalewski/gintro[upstream fork].
+
 *Install:*
 [source,bash]
 ----
@@ -21,7 +24,24 @@ nimble install "https://github.com/KellerKev/gintro"
 * `tests/gen.nim` — generated `set[]` type aliases no longer carry `{.size: sizeof(cint).}` pragma
 * `tests/maxby.nim` — `func` changed to `proc` for closure-parameter functions
 * `gintro/gimplgobj.nim` — all tuple-unpacking from `split()` calls replaced with indexed access
-* `gintro.nimble` — post-generation patches for `gtk4.nim`, `gobject.nim`, `cairo.nim`, `glib.nim`
+* `gintro/gimplgobj.nim` — enum return types (e.g. `gst.FlowReturn`) handled correctly in signal callbacks
+* `gintro/gimplglib.nim` — pure-enum set literal handling for `IOCondition` macros fixed for Nim 2.x
+* `gintro.nimble` — post-generation patches for `gobject.nim`, `glib.nim`, `gst.nim`, `cairo.nim`
+* `gobject.nim` — duplicate `IOCFlag`/`IOCondition` definitions guarded with `when not declared`
+
+*WebKit bindings update:*
+
+The GTK4 WebKit binding was previously `gintro/webkit25` (targeting the never-released WebKit2-5.0).
+It has been updated to `gintro/webkit6` (WebKit-6.0, the GTK4 WebKit). If you were importing
+`webkit25`, change your import to `webkit6`:
+
+[source,nim]
+----
+# Old (broken):
+import gintro/[gtk4, webkit25]
+# New:
+import gintro/[gtk4, webkit6]
+----
 :experimental:
 :imagesdir: http://ssalewski.de/tmp
 //:source-highlighter: pygments
