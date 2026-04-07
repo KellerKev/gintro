@@ -117,3 +117,26 @@ type
 proc uRIHandler*(x: gstapp.AppSink): gst.URIHandler = cast[gst.URIHandler](x)
 
 proc uRIHandler*(x: gstapp.AppSrc): gst.URIHandler = cast[gst.URIHandler](x)
+
+# Missing from GI generation — added manually
+proc gst_app_sink_pull_preroll(self: ptr AppSink00): ptr gst.Sample00 {.importc, libprag.}
+proc pullPreroll*(self: AppSink): gst.Sample =
+  fnew(result, gst.gBoxedFreeGstSample)
+  result.impl = gst_app_sink_pull_preroll(cast[ptr AppSink00](self.impl))
+
+proc gst_app_sink_pull_sample(self: ptr AppSink00): ptr gst.Sample00 {.importc, libprag.}
+proc pullSample*(self: AppSink): gst.Sample =
+  fnew(result, gst.gBoxedFreeGstSample)
+  result.impl = gst_app_sink_pull_sample(cast[ptr AppSink00](self.impl))
+
+proc gst_app_src_push_buffer(self: ptr AppSrc00; buffer: ptr gst.Buffer00): gst.FlowReturn {.importc, libprag.}
+proc pushBuffer*(self: AppSrc; buffer: gst.Buffer): gst.FlowReturn =
+  result = gst_app_src_push_buffer(cast[ptr AppSrc00](self.impl), cast[ptr gst.Buffer00](buffer.impl))
+
+proc gst_app_src_push_sample(self: ptr AppSrc00; sample: ptr gst.Sample00): gst.FlowReturn {.importc, libprag.}
+proc pushSample*(self: AppSrc; sample: gst.Sample): gst.FlowReturn =
+  result = gst_app_src_push_sample(cast[ptr AppSrc00](self.impl), cast[ptr gst.Sample00](sample.impl))
+
+proc gst_app_src_end_of_stream(self: ptr AppSrc00): gst.FlowReturn {.importc, libprag.}
+proc endOfStream*(self: AppSrc): gst.FlowReturn =
+  result = gst_app_src_end_of_stream(cast[ptr AppSrc00](self.impl))

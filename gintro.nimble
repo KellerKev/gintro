@@ -155,7 +155,8 @@ proc prep =
   let mods = listFiles(td / wd / "nim_gi")
   for i in mods:
     let j = splitPath(i).tail
-    if j == "gobject.nim": continue
+    if j == "gobject.nim": continue # pre-patched in repo with when-not-declared(IOCFlag) guard
+    if j == "gstapp.nim": continue # repo version has pullSample; Ubuntu typelib may not generate it
     cpFile(i, this / "gintro" / j)
 
   cd(td)
