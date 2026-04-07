@@ -61,7 +61,15 @@ proc patchGeneratedBindings(gintroDir: string) =
      "  if result != nil and result.impl == nil:"),
     # acquireBuffer: gen.nim omits 'result =' for the C call (triggered by certain GStreamer typelib versions)
     ("\n  gst_buffer_pool_acquire_buffer(cast[ptr BufferPool00](self.impl)",
-     "\n  result = gst_buffer_pool_acquire_buffer(cast[ptr BufferPool00](self.impl)")
+     "\n  result = gst_buffer_pool_acquire_buffer(cast[ptr BufferPool00](self.impl)"),
+    # parseContext result-overload has orphaned `context` refs from the var-overload
+    ("  result.impl = cast[ptr Context00](g_boxed_copy(gst_context_get_type(), result.impl))\n" &
+     "  if context != nil and context.impl == nil:\n" &
+     "    context.ignoreFinalizer = true\n" &
+     "    context = nil\n" &
+     "  if result != nil and result.impl == nil:",
+     "  result.impl = cast[ptr Context00](g_boxed_copy(gst_context_get_type(), result.impl))\n" &
+     "  if result != nil and result.impl == nil:")
   ])
 
   # Fix glib.nim: relax early forward-decl return types (ptr glib.List not yet defined).

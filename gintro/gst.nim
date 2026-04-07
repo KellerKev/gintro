@@ -10128,9 +10128,6 @@ proc parseContext*(self: Query): Context =
   fnew(result, gBoxedFreeGstContext)
   gst_query_parse_context(cast[ptr Query00](self.impl), cast[var ptr Context00](addr result.impl))
   result.impl = cast[ptr Context00](g_boxed_copy(gst_context_get_type(), result.impl))
-  if context != nil and context.impl == nil:
-    context.ignoreFinalizer = true
-    context = nil
   if result != nil and result.impl == nil:
     result.ignoreFinalizer = true
     result = nil
