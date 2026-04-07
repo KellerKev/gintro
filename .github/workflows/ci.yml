@@ -30,6 +30,7 @@ jobs:
             gir1.2-gst-plugins-base-1.0 \
             libsoup-3.0-dev \
             gir1.2-soup-3.0 \
+            xvfb \
             pkg-config \
             wget \
             curl
@@ -42,8 +43,7 @@ jobs:
       - name: Generate and install gintro bindings
         run: |
           export GI_TYPELIB_PATH="/usr/lib/x86_64-linux-gnu/girepository-1.0:/usr/lib/girepository-1.0"
-          export GDK_BACKEND=offscreen
-          nimble install -y
+          xvfb-run -a nimble install -y
 
       - name: Compile GTK4 examples
         run: |

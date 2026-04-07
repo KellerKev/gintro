@@ -6,6 +6,12 @@ nimcache/
 *.dylib
 nimblecache/
 
+# Compiled example binaries (Linux, no extension)
+examples/gtk3/*
+examples/gtk4/*
+!examples/gtk3/*.nim
+!examples/gtk4/*.nim
+
 # Generated binding output (regenerated at install time)
 # Intentionally not tracked — run `nimble install` to regenerate
 # gintro/*.nim  (keep helper modules, ignore generated ones if desired)
