@@ -1475,7 +1475,11 @@ proc genPars(info: GICallableInfo; genProxy = false; binfo: GIBaseInfo = nil; ge
     if genProxy and defaultParameters.contains(sym):
       for hhh in defaultParameters[sym].split('|'):
         var h1, h2, h3: string
-        (h1, h2, h3) = hhh.split
+        let hhhParts = hhh.split
+        if hhhParts.len >= 3:
+          h1 = hhhParts[0]
+          h2 = hhhParts[1]
+          h3 = hhhParts[2]
         if name == h1 and str == h2:
           str.add(" = " & h3)
 
@@ -2813,10 +2817,12 @@ template writeSignal() =
     memo.add(RecSep)
     var plist, arglist: string
     var replist: TableRef[string, (string, RecRes)]
-    (plist, arglist, replist) = genPars(signalInfo, true, info, genArrayMark = true, modPrefix = true)
+    let gp1 = genPars(signalInfo, true, info, genArrayMark = true, modPrefix = true)
+    plist = gp1.plist; arglist = gp1.arglist; replist = gp1.replist
     memo.add(plist)
     memo.add(RecSep)
-    (plist, arglist, replist) = genPars(signalInfo, false, info, genArrayMark = true, modPrefix = true)
+    let gp2 = genPars(signalInfo, false, info, genArrayMark = true, modPrefix = true)
+    plist = gp2.plist; arglist = gp2.arglist; replist = gp2.replist
     memo.add(plist)
     memo = memo.replace("\n    ", " ")
     memo = memo.replace("\"", "\\\"")
@@ -2916,7 +2922,7 @@ proc writeModifierType(info: GIEnumInfo) =
     output.writeLine("\nconst")
     for i in alias:
       output.writeLine(i)
-  output.writeLine("\n  ", we & EM, " {.size: sizeof(cint).} = set[$1Flag]" % [tname])
+  output.writeLine("\n  ", we & EM, " = set[$1Flag]" % [tname])
   if we == "ModifierType":
     output.writeLine("\nconst ModifierMask* = {ModifierFlag.shift .. ModifierFlag.button5, ModifierFlag.super .. ModifierFlag.meta}")
   elif we == "EventMask":
@@ -3004,7 +3010,7 @@ proc writeEnum(info: GIEnumInfo) =
     k = i
 
   if flags:
-    output.writeLine("\n  ", tname & lags & EM, " {.size: sizeof(cint).} = set[$1Flag]" % [tname])
+    output.writeLine("\n  ", tname & lags & EM, " = set[$1Flag]" % [tname])
 
   if alias.len > 0 or flagDefault.len > 0:
     output.writeLine("\nconst")

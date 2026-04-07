@@ -1,0 +1,16 @@
+# Nim build artifacts
+nimcache/
+*.exe
+*.out
+*.so
+*.dylib
+nimblecache/
+
+# Generated binding output (regenerated at install time)
+# Intentionally not tracked — run `nimble install` to regenerate
+# gintro/*.nim  (keep helper modules, ignore generated ones if desired)
+
+# Local test artifacts
+tests/*.out
+tests/gen
+tests/nim_gi/

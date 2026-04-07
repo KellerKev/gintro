@@ -129,7 +129,8 @@ proc $1$2 {.cdecl.} =
         r1s.add(", cast[ptr $5](xdata)[]")
     r1s.add(")\n")
   else: # signals with multiple arguments and maybe using interface providers
-    (sn, wid, num, ahl, all) = sci.split(RecSep)
+    let sciParts = sci.split(RecSep)
+    sn = sciParts[0]; wid = sciParts[1]; num = sciParts[2]; ahl = sciParts[3]; all = sciParts[4]
     #echo "ttt ", ahl
     if ahl.contains("|"): # we have to handle interface providers
       var hargs = ahl.split(";") # handler arguments
@@ -169,7 +170,8 @@ proc $1$2 {.cdecl.} =
       var largslen = largs.len
       while i < largslen:
         if largs[i].endsWith("00Array"):
-          (names[i], types[i]) = largs[i].split(": ")
+          let lp0 = largs[i].split(": ")
+          names[i] = lp0[0]; types[i] = lp0[1]
           let al = largs[i + 1].split(": ")[0]
           var h = types[i]
           # h[0] = h[0].toLowerAscii # before v0.9.7
@@ -182,12 +184,14 @@ proc $1$2 {.cdecl.} =
           largs.delete(i + 1)
           dec(largslen)
         elif largs[i].endsWith("00"):
-          (names[i], types[i]) = largs[i].split(": ptr ")
+          let lp1 = largs[i].split(": ptr ")
+          names[i] = lp1[0]; types[i] = lp1[1]
           types[i].setLen(types[i].len - 2)
         else:
           types[i] = ""#nil # plain arg, no object
-          var a1, a2: string
-          (a1, a2) = largs[i].split(": ")
+          let lp2 = largs[i].split(": ")
+          var a1 = lp2[0]
+          let a2 = lp2[1]
           let h = ct5nt(a2)
           if h.len > 0:
             a1 = h & "(" & a1 & ")"
@@ -242,8 +246,9 @@ proc $1$2 {.cdecl.} =
   if all.find("00Array") >= 0:
     var h = all.split(';')
     for el in mitems(h):
-      var a, b: string
-      (a, b) = el.split(": ")
+      let elParts = el.split(": ")
+      var a = elParts[0]
+      var b = elParts[1]
       if b.find("Array") >= 0:
         b = "ptr " & b.replace("Array")
       el = a & ": " & b
@@ -282,8 +287,9 @@ proc $1$2 {.cdecl.} =
     while i < l:
       # files: seq[gio.File]
       if hhh[i] .find("00Array") >= 0:
-        var a, b: string
-        (a, b) = hhh[i].split(": ")
+        let hhhParts = hhh[i].split(": ")
+        var a = hhhParts[0]
+        var b = hhhParts[1]
         b = b.replace("00Array", "]")
         #if b == "File]":
         #  b = "gio.File]"
