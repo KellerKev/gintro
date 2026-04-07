@@ -29,14 +29,13 @@ proc patchFile(path: string; replacements: openArray[(string, string)]) =
   writeFile(path, content)
 
 proc patchGeneratedBindings(gintroDir: string) =
-  # Fix gtk4.nim: default ApplicationFlags {} -> explicit zero
-  patchFile(gintroDir / "gtk4.nim", [
-    ("flags: gio.ApplicationFlags = {}",
-     "flags: gio.ApplicationFlags = gio.ApplicationFlags(0)")
-  ])
+  # gtk4.nim: default flags value is already correct ({}) now that the size pragma
+  # is removed from set aliases — no patch needed here.
 
-  # Fix gobject.nim: remove broken finalizerfree references
+  # Fix gobject.nim: g_param_spec_pool_free does not exist in GObject API;
+  # remove the call and leave self.impl = nil intact.
   patchFile(gintroDir / "gobject.nim", [
+    ("g_param_spec_pool_free(self.impl)", "discard # g_param_spec_pool_free unavailable"),
     ("new(x, finalizerfree)", "new(x)")
   ])
 
@@ -45,17 +44,22 @@ proc patchGeneratedBindings(gintroDir: string) =
     ("include cairoimpl", "# include cairoimpl  # disabled: types already defined in generated cairo.nim")
   ])
 
-  # Fix glib.nim: relax early forward-decl return types (ptr glib.List not yet defined)
+  # Fix glib.nim: relax early forward-decl return types (ptr glib.List not yet defined).
+  # The generated proc spans two lines so we match only up to the pragma brace.
   patchFile(gintroDir / "glib.nim", [
-    ("): ptr glib.List {.importc, libprag.}",
-     "): pointer {.importc, libprag.}"),
+    ("): ptr glib.List {.",
+     "): pointer {."),
     ("proc g_markup_parse_context_get_element_stack(self: ptr MarkupParseContext00): ptr glib.SList",
      "proc g_markup_parse_context_get_element_stack(self: ptr MarkupParseContext00): pointer"),
-    # Rename duplicate allocator procs to avoid redefinition errors
-    ("proc popAllocator*()",
-     "proc g_list_popAllocator*()"),
-    ("proc pushAllocator*(allocator: Allocator)",
-     "proc g_list_pushAllocator*(allocator: Allocator)")
+    # Comment out duplicate allocator procs (node/slist variants clash with the list version)
+    ("proc popAllocator*() {.\n    importc: \"g_node_pop_allocator\", libprag.}",
+     "# proc popAllocator (g_node_pop_allocator) removed: duplicate"),
+    ("proc popAllocator*() {.\n    importc: \"g_slist_pop_allocator\", libprag.}",
+     "# proc popAllocator (g_slist_pop_allocator) removed: duplicate"),
+    ("proc pushAllocator*(allocator: Allocator) =\n  g_node_push_allocator(cast[ptr Allocator00](allocator.impl))",
+     "# proc pushAllocator (g_node) removed: duplicate"),
+    ("proc pushAllocator*(allocator: Allocator) =\n  g_slist_push_allocator(cast[ptr Allocator00](allocator.impl))",
+     "# proc pushAllocator (g_slist) removed: duplicate")
   ])
 
 proc prep =
