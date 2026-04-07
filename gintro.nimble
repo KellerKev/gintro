@@ -69,6 +69,14 @@ proc patchGeneratedBindings(gintroDir: string) =
      "    context = nil\n" &
      "  if result != nil and result.impl == nil:",
      "  result.impl = cast[ptr Context00](g_boxed_copy(gst_context_get_type(), result.impl))\n" &
+     "  if result != nil and result.impl == nil:"),
+    # parse{Error,Info,Warning}Details result-overloads have orphaned `structure` refs
+    ("  result.impl = cast[ptr Structure00](g_boxed_copy(gst_structure_get_type(), result.impl))\n" &
+     "  if structure != nil and structure.impl == nil:\n" &
+     "    structure.ignoreFinalizer = true\n" &
+     "    structure = nil\n" &
+     "  if result != nil and result.impl == nil:",
+     "  result.impl = cast[ptr Structure00](g_boxed_copy(gst_structure_get_type(), result.impl))\n" &
      "  if result != nil and result.impl == nil:")
   ])
 

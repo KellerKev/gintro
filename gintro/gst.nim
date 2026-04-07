@@ -13945,9 +13945,6 @@ proc parseErrorDetails*(self: Message): Structure  =
     fnew(result, gBoxedFreeGstStructure)
   gst_message_parse_error_details(cast[ptr Message00](self.impl), cast[var ptr Structure00](if addr(result) == nil: nil else: addr result.impl))
   result.impl = cast[ptr Structure00](g_boxed_copy(gst_structure_get_type(), result.impl))
-  if structure != nil and structure.impl == nil:
-    structure.ignoreFinalizer = true
-    structure = nil
   if result != nil and result.impl == nil:
     result.ignoreFinalizer = true
     result = nil
@@ -14002,9 +13999,6 @@ proc parseInfoDetails*(self: Message): Structure  =
     fnew(result, gBoxedFreeGstStructure)
   gst_message_parse_info_details(cast[ptr Message00](self.impl), cast[var ptr Structure00](if addr(result) == nil: nil else: addr result.impl))
   result.impl = cast[ptr Structure00](g_boxed_copy(gst_structure_get_type(), result.impl))
-  if structure != nil and structure.impl == nil:
-    structure.ignoreFinalizer = true
-    structure = nil
   if result != nil and result.impl == nil:
     result.ignoreFinalizer = true
     result = nil
@@ -14389,9 +14383,6 @@ proc parseWarningDetails*(self: Message): Structure  =
     fnew(result, gBoxedFreeGstStructure)
   gst_message_parse_warning_details(cast[ptr Message00](self.impl), cast[var ptr Structure00](if addr(result) == nil: nil else: addr result.impl))
   result.impl = cast[ptr Structure00](g_boxed_copy(gst_structure_get_type(), result.impl))
-  if structure != nil and structure.impl == nil:
-    structure.ignoreFinalizer = true
-    structure = nil
   if result != nil and result.impl == nil:
     result.ignoreFinalizer = true
     result = nil

@@ -2034,6 +2034,7 @@ proc writeMethod(info: GIBaseInfo; minfo: GIFunctionInfo) =
   try:
 
     for tryOut2Ret in [false, true]: # puh
+      nilArgFix = @[] # reset for each overload variant; otherwise var-overload names leak into result-overload
 
       if tryOut2Ret:
         var ret2 = gCallableInfoGetReturnType(minfo)
