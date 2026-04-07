@@ -34,14 +34,10 @@ proc patchGeneratedBindings(gintroDir: string) =
 
   # Fix gobject.nim: g_param_spec_pool_free does not exist in GObject API;
   # remove the call and leave self.impl = nil intact.
-  patchFile(gintroDir / "gobject.nim", [
-    ("g_param_spec_pool_free(self.impl)", "discard # g_param_spec_pool_free unavailable"),
-    ("new(x, finalizerfree)", "new(x)"),
-    # IOCFlag/IOCondition are also in glib.nim; wrap in when-not-declared to avoid ambiguity
-    # when both glib and gobject are imported in the same module.
-    ("  IOCFlag* {.size: sizeof(cint), pure.} = enum\n    `in` = 0\n    pri = 1\n    `out` = 2\n    err = 3\n    hup = 4\n    nval = 5\n\n  IOCondition* = set[IOCFlag]",
-     "when not declared(IOCFlag):\n  type\n    IOCFlag* {.size: sizeof(cint), pure.} = enum\n      `in` = 0\n      pri = 1\n      `out` = 2\n      err = 3\n      hup = 4\n      nval = 5\n    IOCondition* = set[IOCFlag]")
-  ])
+  # gobject.nim is NOT patched here — we use the pre-patched repo version instead
+  # (see the copy loop below which skips gobject.nim from nim_gi/).
+  # The repo's gintro/gobject.nim already has: g_param_spec_pool_free removed,
+  # new(x, finalizerfree) → new(x), and the when-not-declared(IOCFlag) guard.
 
   # cairo.nim: cairoimpl include is needed (provides lineTo, moveTo, save, etc.)
   # On macOS it was disabled due to type duplication, but gen.nim now generates
@@ -133,10 +129,14 @@ proc prep =
   # Apply Nim 2.x compatibility patches to generated files
   patchGeneratedBindings(td / wd / "nim_gi")
 
-  # Install: copy patched generated files back into the package gintro/ directory
+  # Install: copy patched generated files back into the package gintro/ directory.
+  # Skip gobject.nim — the repo version already has the when-not-declared(IOCFlag)
+  # guard applied correctly (patching it from the downloaded oldgtk3 version breaks
+  # the surrounding type block context).
   let mods = listFiles(td / wd / "nim_gi")
   for i in mods:
     let j = splitPath(i).tail
+    if j == "gobject.nim": continue
     cpFile(i, this / "gintro" / j)
 
   cd(td)
