@@ -42,7 +42,7 @@ This document describes mainly the use of these bindings for GTK3. For GTK4 you 
 *Nim GTK4 book* located at http://ssalewski.de/gtkprogramming.html.
 
 WARNING: Please do not use the code from the examples in this page, but use the actual code from
-https://github.com/StefanSalewski/gintro/tree/master/examples . The github readme.adoc does not
+https://github.com/KellerKev/gintro/tree/master/examples . The github readme.adoc does not
 allow to insert code from files, so I had to manually insert it, and so that code in the html page
 may not compile with latest gintro version. I plan to create a new page hosted somewhere else
 with code inserted from files directly.
@@ -319,7 +319,7 @@ Currently there are at least 3 sources of GTK3 bindings for Nim:
 
 * https://github.com/ngtk3 (obsolete, has been deleted)
 * https://github.com/StefanSalewski/oldgtk3
-* https://github.com/StefanSalewski/gintro
+* https://github.com/KellerKev/gintro
 
 ngtk3 was the first attempt to provide GTK3 support for Nim. It contained single repositories for all the GTK related libraries and
 was not supported by nimble package manager. It was created from GTK 3.20 headers and is now deprecated.
@@ -406,7 +406,7 @@ files for various OS and GTK versions, but building locally is preferred when po
 == A few basic examples
 
 NOTE: Currently we do not install the example programs. If you want to try them, you have to copy the source code of the
-examples from https://github.com/StefanSalewski/gintro/tree/master/examples to your local computer, maybe to /tmp/gintro/examples directory.
+examples from https://github.com/KellerKev/gintro/tree/master/examples to your local computer, maybe to /tmp/gintro/examples directory.
 
 Then you can compile and run them from shell with commands like
 
